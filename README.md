@@ -1,29 +1,29 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+The component canicompet-datetime-button replace the component <ion-datetime-button> from the ionic project.
 
-### What is this repository for? ###
+The idea is to improve the selection of the year and removing the "wheel" which is a mess to use.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+![canicompet-datetime-button](https://blog.canicompet.fr/wp-content/uploads/2023/08/canicompet-datetime-button.png)
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+0.  Clone the repository in your project
+2.  Import the component in *.module.ts
+```
+import { CanicompetDatetimeButtonModule } from '../../component/canicompet-datetime-button/canicompet-datetime-button-module';
+@NgModule({
+  imports: [
+  	...,
+    CanicompetDatetimeButtonModule
+  ],
+  declarations: [...Page]
+})
+```
 
-### Contribution guidelines ###
+3.  Use it in place of <ion-datetime-button>
+```
+<canicompet-datetime-button [value]="birthdayDate" (ionChange)="onNgModelBirthdayChange($event)" max="2050-01-01"></canicompet-datetime-button>
+```
 
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+I have only implemented what I need, feel free to improve it.

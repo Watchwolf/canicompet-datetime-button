@@ -1,0 +1,9 @@
+
+ion-modal.canicompet-datetime-button {
+  &::part(content) {
+    width: 400px;
+    height: 420px;
+    padding: 0px;
+    overflow-y: hidden; overflow-x: hidden;
+  }
+}
