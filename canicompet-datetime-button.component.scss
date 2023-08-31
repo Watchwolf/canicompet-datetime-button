@@ -7,3 +7,13 @@ ion-modal.canicompet-datetime-button {
     overflow-y: hidden; overflow-x: hidden;
   }
 }
+
+ion-modal.canicompet-datetime-button ion-grid {
+  border: 0;
+}
+ion-modal.canicompet-datetime-button ion-grid ion-row {
+  border: 0;
+}
+ion-modal.canicompet-datetime-button ion-grid ion-col {
+  border: 0;
+}

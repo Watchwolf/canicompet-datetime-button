@@ -28,6 +28,7 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   @Input() doneText: string;
   @Input() cancelText: string;
   @Input() max: string;
+  @Input() min: string;
   valueInitial: string;
   @Input() _value: string;
   @Input() set value(value: string) {
@@ -138,10 +139,12 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   }
 
   present() {
-    this.modal.present();
     setTimeout(() => {
+      this.modal.present();
+      setTimeout(() => {
         this.showCalendarCB();
-    }, 100);
+      }, 5);
+    }, 5);
   }
 
 }
