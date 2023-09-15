@@ -70,7 +70,7 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
       max = this.dateUtils.fromString(this.max).getFullYear();
     }
 
-    for(var i = 1960; i <= max; i++) {
+    for(var i = 1940; i <= max; i++) {
       this.years.push(i)
     }
   }
