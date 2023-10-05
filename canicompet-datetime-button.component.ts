@@ -24,10 +24,11 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
 
   @Input() presentation: string = 'date';
 
-  @Input() title: string;
+  @Input() title: string = null;
   @Input() doneText: string;
   @Input() cancelText: string;
-  @Input() max: string;
+  @Input() max: string = '2050-12-31';
+  @Input() min: string = '1940-01-01';
   valueInitial: string;
   @Input() _value: string;
   @Input() set value(value: string) {
@@ -56,21 +57,25 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
     private cdref: ChangeDetectorRef,
     private translate: TranslateService) { 
     this.id = this.uuidv4()
-
-    this.title = this.translate.instant('Select a date')
   }
 
   ngOnInit() {
   }
 
   updateYears() {
+
     this.years = []
     var max = 2050;
     if (this.max != null) {
       max = this.dateUtils.fromString(this.max).getFullYear();
     }
 
-    for(var i = 1940; i <= max; i++) {
+    var min = 1940;
+    if (this.min != null) {
+      min = this.dateUtils.fromString(this.min).getFullYear();
+    }
+
+    for(var i = min; i <= max; i++) {
       this.years.push(i)
     }
   }
@@ -123,6 +128,10 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   }
 
   showCalendarCB() {
+    if(this.title == null) {
+      this.title = this.translate.instant('Select a date')
+    }
+    
     var myElement = document.getElementById(this.id + '__item__' + this.year);
     if(myElement != null) {
       var topPos = myElement.offsetTop;

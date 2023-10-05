@@ -15,7 +15,7 @@
           <ion-datetime *ngIf="_value" id="{{id}}" (ionCancel)="datetimeIonCancel($event)" (ionChange)="datetimeIonChange($event)" [value]="_value" 
               [showDefaultButtons]="true"  doneText="{{ 'Ok' | translate}}" cancelText="{{ 'Cancel' | translate}}" 
               first-day-of-week="1" [presentation]="presentation" class="canicompet-datetime"
-              max="{{ max }}" #datetime></ion-datetime>
+              max="{{ max }}" min="{{ min }}" #datetime></ion-datetime>
         </ion-col>
         <ion-col>
           <div style="max-height: 350px; display: block; overflow-y: auto; overflow-x: hidden;" id="{{id}}__items">
