@@ -8,6 +8,16 @@ ion-modal.canicompet-datetime-button {
   }
 }
 
+ion-modal.canicompet-datetime-button-time {
+  &::part(content) {
+    width: 400px;
+    height: 550px;
+    padding: 0px;
+    overflow-y: hidden; overflow-x: hidden;
+  }
+}
+
+
 ion-modal.canicompet-datetime-button ion-grid {
   border: 0;
 }
