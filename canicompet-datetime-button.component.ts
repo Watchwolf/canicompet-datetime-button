@@ -46,6 +46,7 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
     } else {
       this.buttonLabel = this.dateUtils.toStringShortWithoutTimeWithDay(this.dateUtils.fromString(value));
     }
+    this.updateYears();
     this.cdref.detectChanges();
   }
   get value(): string {
@@ -58,13 +59,21 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
     this.id = this.uuidv4()
 
     this.title = this.translate.instant('Select a date')
-
-    for(var i = 1960; i < 2050; i++) {
-      this.years.push(i)
-    }
   }
 
   ngOnInit() {
+  }
+
+  updateYears() {
+    this.years = []
+    var max = 2050;
+    if (this.max != null) {
+      max = this.dateUtils.fromString(this.max).getFullYear();
+    }
+
+    for(var i = 1960; i <= max; i++) {
+      this.years.push(i)
+    }
   }
 
   uuidv4() {
