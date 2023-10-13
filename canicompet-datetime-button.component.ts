@@ -156,10 +156,12 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   }
 
   present() {
-    this.modal.present();
     setTimeout(() => {
+      this.modal.present();
+      setTimeout(() => {
         this.showCalendarCB();
-    }, 100);
+      }, 5);
+    }, 5);
   }
 
 }

@@ -1,7 +1,7 @@
 
 <ion-button color="primary" (click)="buttonClickCB()" size="small"><ion-label>{{buttonLabel}}</ion-label></ion-button>
 
-<ion-modal (ionModalDidDismiss)="hideCalendarCB()" (ionModalWillPresent)="showWillCalendarCB()" (ionModalDidPresent)="showCalendarCB()" #modal class="canicompet-datetime-button">
+<ion-modal [keepContentsMounted]="true" (ionModalDidDismiss)="hideCalendarCB()" (ionModalWillPresent)="showWillCalendarCB()" (ionModalDidPresent)="showCalendarCB()" #modal class="canicompet-datetime-button">
   <ng-template>
     <ion-header *ngIf="title != null">
       <ion-toolbar>
