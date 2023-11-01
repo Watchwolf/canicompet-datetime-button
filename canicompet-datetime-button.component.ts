@@ -95,10 +95,19 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
 
     var elt = document.querySelector("#" + this.id.replaceAll('-', '\\-'))
     if(elt != null) {
-      elt = elt.shadowRoot.querySelector('slot[name="time-label"]')
-      if(elt != null)
-        elt.innerHTML = this.translate.instant('Time');
+      var elt2 = elt.shadowRoot.querySelector<HTMLElement>('slot[name="time-label"]')
+      if(elt2 != null)
+        elt2.innerHTML = this.translate.instant('Time');
+
+
+      elt2 = elt.shadowRoot.querySelector<HTMLElement>('div.calendar-body')
+      if(elt2 != null) {
+        elt2.style.opacity = '1'
+      }
     }
+
+
+
   }
 
   datetimeIonChange(event) {
