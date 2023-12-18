@@ -109,10 +109,14 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
       if(elt2 != null)
         elt2.innerHTML = this.translate.instant('Time');
 
-
       elt2 = elt.shadowRoot.querySelector<HTMLElement>('div.calendar-body')
       if(elt2 != null) {
         elt2.style.opacity = '1'
+      }
+
+      elt2 = elt.shadowRoot.querySelector<HTMLElement>('div.calendar-month-year > ion-item > ion-label > ion-icon')
+      if(elt2 != null) {
+        elt2.remove();
       }
     }
   }
