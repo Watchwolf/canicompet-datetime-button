@@ -3,6 +3,8 @@ import { DateUtilsService } from './../../services/date-utils.service';
 import { AlertController, IonModal, IonDatetime } from '@ionic/angular';
 import { ChangeDetectorRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { parse, parseISO, differenceInSeconds, addDays, addHours, getDay, fromUnixTime, addYears } from 'date-fns'
+
 
 @Component({
   selector: 'canicompet-datetime-button',
@@ -23,6 +25,8 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   @Output() ionChange = new EventEmitter<void>();
 
   @Input() presentation: string = 'date';
+  @Input() buttonFill: string = 'solid';
+  @Input() buttonLabelFormat: string = 'date';
 
   @Input() title: string = null;
   @Input() doneText: string;
@@ -43,12 +47,19 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
 
     if(this.presentation == 'date-time') {
       this.buttonLabel = this.dateUtils.toStringShortWithTimeWithDay(this.dateUtils.fromString(value));
-    } else {
+    } else if(this.presentation == 'week') {
+      this.buttonLabel = this.translate.instant('Week') + ' ' + this.dateUtils.toStringShortWithoutTimeWithDay(this.dateUtils.fromString(value));
+    } else if(this.presentation == 'month') {
+      this.buttonLabel = this.dateUtils.toStringMonthYear(this.dateUtils.fromString(value));
+    } else if(this.buttonLabelFormat == 'date') {
       this.buttonLabel = this.dateUtils.toStringShortWithoutTimeWithDay(this.dateUtils.fromString(value));
+    } else if(this.buttonLabelFormat == 'dateWithDay') {
+      this.buttonLabel = this.dateUtils.toStringWithoutTimeWithDay(this.dateUtils.fromString(value));
     }
     this.updateYears();
     this.cdref.detectChanges();
   }
+
   get value(): string {
     return this._value;
   }
@@ -63,7 +74,6 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   }
 
   updateYears() {
-
     this.years = []
     var max = 2050;
     if (this.max != null) {
@@ -105,13 +115,25 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
         elt2.style.opacity = '1'
       }
     }
-
-
-
   }
 
   datetimeIonChange(event) {
+    console.log(event.detail.value)
     if(!this.isFreeze) {
+      //On arrondis à la date du lundi de la semaine
+      if(this.presentation == 'week') {
+        var date = this.dateUtils.fromString(event.detail.value);
+        date.setDate(date.getDate() - date.getDay() + 1);
+        event.detail.value = this.dateUtils.toStringIso(date);
+      }
+
+      //On arrondis à la date au1er du mois
+      if(this.presentation == 'month') {
+        var date = this.dateUtils.fromString(event.detail.value);
+        date = addDays(date, -date.getDate() + 1)
+        event.detail.value = this.dateUtils.toStringIso(date);
+      }
+
       this.ionChange.emit(event);
       this.modal.dismiss();
       this.cdref.detectChanges();
@@ -120,17 +142,30 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
 
   selectBtYearCB(year) {
     this.year = year;
-
     var elt = document.querySelector("#" + this.id.replaceAll('-', '\\-'))
     if(elt != null) {
-      elt = elt.shadowRoot.querySelector('button[aria-selected="true"]')
-      if(elt != null) {
-        var date = new Date(this.year, Number(elt.getAttribute('data-month')) - 1, Number(elt.getAttribute('data-day')));
-        if(date != null) {
-          this.isFreeze = true;
-          this.value = this.dateUtils.toStringIsoWithoutTimezone(date);
-          this.isFreeze = false;
-          this.datetime.reset(this.value);
+      if(this.presentation == 'month') {
+        elt = elt.shadowRoot.querySelector('ion-picker-column-internal')
+        elt = elt.shadowRoot.querySelector('button[part="wheel-item active"]')
+        if(elt) {
+          var date = new Date(this.year, Number(elt.getAttribute('data-value')) - 1, 1);
+          if(date != null) {
+            this.isFreeze = true;
+            this.value = this.dateUtils.toStringIsoWithoutTimezone(date);
+            this.isFreeze = false;
+            this.datetime.reset(this.value);
+          }
+        }
+      } else {
+        elt = elt.shadowRoot.querySelector('button[aria-selected="true"]')
+        if(elt != null) {
+          var date = new Date(this.year, Number(elt.getAttribute('data-month')) - 1, Number(elt.getAttribute('data-day')));
+          if(date != null) {
+            this.isFreeze = true;
+            this.value = this.dateUtils.toStringIsoWithoutTimezone(date);
+            this.isFreeze = false;
+            this.datetime.reset(this.value);
+          }
         }
       }
     }
