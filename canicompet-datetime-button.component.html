@@ -1,7 +1,7 @@
 
-<ion-button color="primary" (click)="buttonClickCB()" size="small"><ion-label>{{buttonLabel}}</ion-label></ion-button>
+<ion-button [fill]="buttonFill" color="primary" (click)="buttonClickCB()" size="small"><ion-label>{{buttonLabel}}</ion-label></ion-button>
 
-<ion-modal [keepContentsMounted]="true" (ionModalDidDismiss)="hideCalendarCB()" (ionModalWillPresent)="showWillCalendarCB()" (ionModalDidPresent)="showCalendarCB()" #modal [class]="presentation == 'date' ? 'canicompet-datetime-button': 'canicompet-datetime-button canicompet-datetime-button-time'">
+<ion-modal style="--backdrop-opacity: 0.5;" [keepContentsMounted]="true" (ionModalDidDismiss)="hideCalendarCB()" (ionModalWillPresent)="showWillCalendarCB()" (ionModalDidPresent)="showCalendarCB()" #modal [class]="presentation == 'date' ? 'canicompet-datetime-button': 'canicompet-datetime-button canicompet-datetime-button-time'">
   <ng-template>
     <ion-header *ngIf="title != null">
       <ion-toolbar>
@@ -14,7 +14,7 @@
         <ion-row><ion-col>
           <ion-datetime *ngIf="_value" id="{{id}}" (ionCancel)="datetimeIonCancel($event)" (ionChange)="datetimeIonChange($event)" [value]="_value" 
               [showDefaultButtons]="true"  doneText="{{ 'Ok' | translate}}" cancelText="{{ 'Cancel' | translate}}" 
-              first-day-of-week="1" [presentation]="presentation" class="canicompet-datetime"
+              first-day-of-week="1" [presentation]="presentation == 'week' ? 'date': presentation" class="canicompet-datetime"
               max="{{ max }}" min="{{ min }}" #datetime></ion-datetime>
         </ion-col>
         <ion-col>
