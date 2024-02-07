@@ -36,16 +36,10 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   valueInitial: string;
   @Input() _value: string;
   @Input() set value(value: string) {
-    if(value == null || value == '')
-      value = this.dateUtils.toStringIso(new Date())
 
-    if(!this.isFreeze && value != null && value != '') {
-      this.valueInitial = value;
-      this.selectBtYearCB(this.dateUtils.fromString(value).getFullYear());
-    }
-    this._value = value;
-
-    if(this.presentation == 'date-time') {
+    if(value == null) {
+      this.buttonLabel = this.translate.instant('Undefined')
+    } else if(this.presentation == 'date-time') {
       this.buttonLabel = this.dateUtils.toStringShortWithTimeWithDay(this.dateUtils.fromString(value));
     } else if(this.presentation == 'week') {
       this.buttonLabel = this.translate.instant('Week') + ' ' + this.dateUtils.toStringShortWithoutTimeWithDay(this.dateUtils.fromString(value));
@@ -56,6 +50,16 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
     } else if(this.buttonLabelFormat == 'dateWithDay') {
       this.buttonLabel = this.dateUtils.toStringWithoutTimeWithDay(this.dateUtils.fromString(value));
     }
+
+    if(value == null || value == '')
+      value = this.dateUtils.toStringIso(new Date())
+
+    if(!this.isFreeze && value != null && value != '') {
+      this.valueInitial = value;
+      this.selectBtYearCB(this.dateUtils.fromString(value).getFullYear());
+    }
+    this._value = value;
+
     this.updateYears();
     this.cdref.detectChanges();
   }
@@ -122,7 +126,6 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   }
 
   datetimeIonChange(event) {
-    console.log(event.detail.value)
     if(!this.isFreeze) {
       //On arrondis à la date du lundi de la semaine
       if(this.presentation == 'week') {
