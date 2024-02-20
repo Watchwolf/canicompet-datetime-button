@@ -37,6 +37,11 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   @Input() _value: string;
   @Input() set value(value: string) {
 
+    if(!this.isFreeze && value != null && value != '') {
+      this.valueInitial = value;
+      this.selectBtYearCB(this.dateUtils.fromString(value).getFullYear());
+    }
+
     if(value == null) {
       this.buttonLabel = this.translate.instant('Undefined')
     } else if(this.presentation == 'date-time') {
@@ -53,11 +58,6 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
 
     if(value == null || value == '')
       value = this.dateUtils.toStringIso(new Date())
-
-    if(!this.isFreeze && value != null && value != '') {
-      this.valueInitial = value;
-      this.selectBtYearCB(this.dateUtils.fromString(value).getFullYear());
-    }
     this._value = value;
 
     this.updateYears();
@@ -158,7 +158,7 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
           var date = new Date(this.year, Number(elt.getAttribute('data-value')) - 1, 1);
           if(date != null) {
             this.isFreeze = true;
-            this.value = this.dateUtils.toStringIsoWithoutTimezone(date);
+            this.value = this.dateUtils.toStringIso(date);
             this.isFreeze = false;
             this.datetime.reset(this.value);
           }
@@ -169,7 +169,7 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
           var date = new Date(this.year, Number(elt.getAttribute('data-month')) - 1, Number(elt.getAttribute('data-day')));
           if(date != null) {
             this.isFreeze = true;
-            this.value = this.dateUtils.toStringIsoWithoutTimezone(date);
+            this.value = this.dateUtils.toStringIso(date);
             this.isFreeze = false;
             this.datetime.reset(this.value);
           }
