@@ -1,5 +1,5 @@
 
-<ion-button [fill]="buttonFill" color="primary" (click)="buttonClickCB()" size="small"><ion-label>{{buttonLabel}}</ion-label></ion-button>
+<ion-input type="text" (click)="buttonClickCB()" (focus)="buttonClickCB()" [readonly]="true" [value]="buttonLabel"></ion-input>
 
 <ion-modal style="--backdrop-opacity: 0.5;" [keepContentsMounted]="true" (ionModalDidDismiss)="hideCalendarCB()" (ionModalWillPresent)="showWillCalendarCB()" (ionModalDidPresent)="showCalendarCB()" #modal [class]="presentation == 'date' ? 'canicompet-datetime-button': 'canicompet-datetime-button canicompet-datetime-button-time'">
   <ng-template>
