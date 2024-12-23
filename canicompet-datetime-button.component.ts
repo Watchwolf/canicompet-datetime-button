@@ -1,74 +1,90 @@
 import { Component, OnInit, ViewEncapsulation, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
-import { DateUtilsService } from './../../services/date-utils.service';
 import { AlertController, IonModal, IonDatetime } from '@ionic/angular';
 import { ChangeDetectorRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { parse, parseISO, differenceInSeconds, addDays, addHours, getDay, fromUnixTime, addYears } from 'date-fns'
-
+import { da, de, enGB, es, fi, fr, it, nl, pt, sv } from 'date-fns/locale';
+import { toZonedTime, format, getTimezoneOffset } from 'date-fns-tz'
 
 @Component({
   selector: 'canicompet-datetime-button',
   templateUrl: './canicompet-datetime-button.component.html',
   styleUrls: ['./canicompet-datetime-button.component.scss'],
+  standalone: false
 })
 export class CanicompetDatetimeButtonComponent implements OnInit {
   @ViewChild('modal', { static: false }) modal!: IonModal;
   @ViewChild('datetime', { static: false }) datetime!: IonDatetime;
   @ViewChild('datetime', { static: false }) datetimeRef!: ElementRef;
 
-  id = '';
-  years = []
-  year = 2000
+  id: string = '';
+  years: number[] = []
+  year: number = 2000
   isFreeze: Boolean = false;
-  buttonLabel = ''
+  buttonLabel: string = ''
+  valueInitial: string;
 
+  //Emit when the user validate a new date
   @Output() ionChange = new EventEmitter<void>();
 
+  //same value than the ion-datetime presentation
   @Input() presentation: string = 'date';
+  //same value than the button fill
   @Input() buttonFill: string = 'solid';
+  //date or dateWithDay
   @Input() buttonLabelFormat: string = 'date';
 
+  //the title of the modal
   @Input() title: string = null;
+  //the text of the button which valid the new date
   @Input() doneText: string;
+  //the text of the button which cancel the change
   @Input() cancelText: string;
+  //The maximum date, format yyyy-mm-dd
   @Input() max: string = '2050-12-31';
+  //The minimum date, format yyyy-mm-dd
   @Input() min: string = '1940-01-01';
-  valueInitial: string;
-  @Input() _value: string;
+
+  //The maximum height of the input 
+  @Input() maxHeight: string = null;
+
+  _value: string;
+  //Set the date, old form working with date-fns.parseISO
   @Input() set value(value: string) {
 
     if(!this.isFreeze && value != null && value != '') {
       this.valueInitial = value;
-      this.selectBtYearCB(this.dateUtils.fromString(value).getFullYear());
+      this.selectBtYearCB(this.dateFromString(value).getFullYear());
     }
 
     if(value == null) {
       this.buttonLabel = this.translate.instant('Undefined')
     } else if(this.presentation == 'date-time') {
-      this.buttonLabel = this.dateUtils.toStringShortWithTimeWithDay(this.dateUtils.fromString(value));
+      this.buttonLabel = this.dateToStringShortWithTimeWithDay(this.dateFromString(value));
     } else if(this.presentation == 'week') {
-      this.buttonLabel = this.translate.instant('Week') + ' ' + this.dateUtils.toStringShortWithoutTimeWithDay(this.dateUtils.fromString(value));
+      this.buttonLabel = this.translate.instant('Week') + ' ' + this.dateToStringShortWithoutTimeWithDay(this.dateFromString(value));
     } else if(this.presentation == 'month') {
-      this.buttonLabel = this.dateUtils.toStringMonthYear(this.dateUtils.fromString(value));
+      this.buttonLabel = this.dateToStringMonthYear(this.dateFromString(value));
     } else if(this.buttonLabelFormat == 'date') {
-      this.buttonLabel = this.dateUtils.toStringShortWithoutTimeWithDay(this.dateUtils.fromString(value));
+      this.buttonLabel = this.dateToStringShortWithoutTimeWithDay(this.dateFromString(value));
     } else if(this.buttonLabelFormat == 'dateWithDay') {
-      this.buttonLabel = this.dateUtils.toStringWithoutTimeWithDay(this.dateUtils.fromString(value));
+      this.buttonLabel = this.dateToStringWithoutTimeWithDay(this.dateFromString(value));
     }
 
     if(value == null || value == '')
-      value = this.dateUtils.toStringIso(new Date())
+      value = this.dateToStringIso(new Date())
     this._value = value;
 
     this.updateYears();
     this.cdref.detectChanges();
   }
 
+  //get the date
   get value(): string {
     return this._value;
   }
 
-  constructor(public dateUtils: DateUtilsService,
+  constructor(
     private cdref: ChangeDetectorRef,
     private translate: TranslateService) { 
     this.id = this.uuidv4()
@@ -77,16 +93,17 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   ngOnInit() {
   }
 
+  //populate the list of availables year
   updateYears() {
     this.years = []
-    var max = 2050;
+    var max: number = 2050;
     if (this.max != null) {
-      max = this.dateUtils.fromString(this.max).getFullYear();
+      max = this.dateFromString(this.max).getFullYear();
     }
 
     var min = 1940;
     if (this.min != null) {
-      min = this.dateUtils.fromString(this.min).getFullYear();
+      min = this.dateFromString(this.min).getFullYear();
     }
 
     for(var i = min; i <= max; i++) {
@@ -101,6 +118,7 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
     });
   }
 
+  //Hack some CSS of ion-datetime
   setCSS() {
     if(document.querySelector("#" + this.id.replaceAll('-', '\\-')) != null) {
       document.querySelector("#" + this.id.replaceAll('-', '\\-')).shadowRoot.append(
@@ -125,20 +143,21 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
     }
   }
 
+  //Execute by ion-datetime when the date change
   datetimeIonChange(event) {
     if(!this.isFreeze) {
       //On arrondis à la date du lundi de la semaine
       if(this.presentation == 'week') {
-        var date = this.dateUtils.fromString(event.detail.value);
+        var date = this.dateFromString(event.detail.value);
         date.setDate(date.getDate() - date.getDay() + 1);
-        event.detail.value = this.dateUtils.toStringIso(date);
+        event.detail.value = this.dateToStringIso(date);
       }
 
       //On arrondis à la date au1er du mois
       if(this.presentation == 'month') {
-        var date = this.dateUtils.fromString(event.detail.value);
+        var date = this.dateFromString(event.detail.value);
         date = addDays(date, -date.getDate() + 1)
-        event.detail.value = this.dateUtils.toStringIso(date);
+        event.detail.value = this.dateToStringIso(date);
       }
 
       this.ionChange.emit(event);
@@ -147,6 +166,7 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
     }
   }
 
+  //The user select a year
   selectBtYearCB(year) {
     this.year = year;
     var elt = document.querySelector("#" + this.id.replaceAll('-', '\\-'))
@@ -155,10 +175,10 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
         elt = elt.shadowRoot.querySelector('ion-picker-column-internal')
         elt = elt.shadowRoot.querySelector('button[part="wheel-item active"]')
         if(elt) {
-          var date = new Date(this.year, Number(elt.getAttribute('data-value')) - 1, 1);
+          var date: Date = new Date(this.year, Number(elt.getAttribute('data-value')) - 1, 1);
           if(date != null) {
             this.isFreeze = true;
-            this.value = this.dateUtils.toStringIso(date);
+            this.value = this.dateToStringIso(date);
             this.isFreeze = false;
             this.datetime.reset(this.value);
           }
@@ -166,10 +186,10 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
       } else {
         elt = elt.shadowRoot.querySelector('button[aria-selected="true"]')
         if(elt != null) {
-          var date = new Date(this.year, Number(elt.getAttribute('data-month')) - 1, Number(elt.getAttribute('data-day')));
+          var date: Date = new Date(this.year, Number(elt.getAttribute('data-month')) - 1, Number(elt.getAttribute('data-day')));
           if(date != null) {
             this.isFreeze = true;
-            this.value = this.dateUtils.toStringIso(date);
+            this.value = this.dateToStringIso(date);
             this.isFreeze = false;
             this.datetime.reset(this.value);
           }
@@ -178,6 +198,7 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
     }
   }
 
+  //Execute when the modal is open
   showCalendarCB() {
     if(this.title == null) {
       this.title = this.translate.instant('Select a date')
@@ -198,14 +219,17 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   hideCalendarCB() {
   }
 
+  //Open the modal
   buttonClickCB() {
     this.present();
   }
 
+  //The user cancel the change
   datetimeIonCancel(event) {
     this.value = this.valueInitial;
   }
 
+  //Open the modal
   present() {
     setTimeout(() => {
       this.modal.present();
@@ -215,4 +239,64 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
     }, 5);
   }
 
+
+  dateFromString(date: string): Date {
+    return date ? toZonedTime(parseISO(date), Intl.DateTimeFormat().resolvedOptions().timeZone): null;
+  }
+
+  dateToStringShortWithTimeWithDay(date: Date, locale = fr): string {
+    if(date == null)
+      return '';
+    return format(date, 'd LLL yyyy HH:mm', {locale: this.dateGetLocale(this.translate.currentLang)});
+  }
+
+  dateToStringShortWithoutTimeWithDay(date: Date, locale = fr): string {
+    if(date == null)
+      return '';
+    return format(date, 'd LLL yyyy', {locale: this.dateGetLocale(this.translate.currentLang)});
+  }
+
+  dateToStringMonthYear(date: Date, locale = fr): string {
+    if(date == null)
+      return '';
+
+    return format(date, 'MM/yyyy', {locale: this.dateGetLocale(this.translate.currentLang)});
+  }
+
+  dateToStringWithoutTimeWithDay(date: Date, locale = fr): string {
+    if(date == null)
+      return '';
+    return format(date, 'EEEE d LLLL yyyy', {locale: this.dateGetLocale(this.translate.currentLang)});
+  }
+
+  dateToStringIso(date: Date, locale = fr): string {
+    if(date == null)
+      return '';
+    return format(date, "yyyy-MM-dd'T'HH:mm:ssXXXXX", {locale: this.dateGetLocale(this.translate.currentLang)});
+  }
+
+
+  dateGetLocale(code: String) {
+    if(code == 'da')
+      return da;
+    if(code == 'de')
+      return de;
+    if(code == 'en')
+      return enGB;
+    if(code == 'es')
+      return es;
+    if(code == 'fi')
+      return fi;
+    if(code == 'fr')
+      return fr;
+    if(code == 'it')
+      return it;
+    if(code == 'nl')
+      return nl;
+    if(code == 'pt')
+      return pt;
+    if(code == 'sv')
+      return sv;
+    return enGB;
+  }
 }
