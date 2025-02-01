@@ -27,6 +27,9 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
   //Emit when the user validate a new date
   @Output() ionChange = new EventEmitter<void>();
 
+  //Label when the date is undefined/empty
+  @Input() labelEmpty: string = null;
+
   //same value than the ion-datetime presentation
   @Input() presentation: string = 'date';
   //same value than the button fill
@@ -58,7 +61,7 @@ export class CanicompetDatetimeButtonComponent implements OnInit {
     }
 
     if(value == null) {
-      this.buttonLabel = this.translate.instant('Undefined')
+      this.buttonLabel = this.labelEmpty ? this.labelEmpty : this.translate.instant('Undefined')
     } else if(this.presentation == 'date-time') {
       this.buttonLabel = this.dateToStringShortWithTimeWithDay(this.dateFromString(value));
     } else if(this.presentation == 'week') {
